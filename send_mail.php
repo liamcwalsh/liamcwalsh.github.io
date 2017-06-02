@@ -26,23 +26,23 @@ $message = $_REQUEST['message'] ;
 
 // If the user tries to access this script directly, redirect them to feedback form,
 if (!isset($_REQUEST['email_address'])) {
-header( "Location: ../contact.html" );
+header( "Location: contact.html" );
 }
 
 // If the form fields are empty, redirect to the error page.
 elseif (empty($email_address) || empty($message)) {
-header( "Location: ../error.html" );
+header( "Location: error.html" );
 }
 
 // If email injection is detected, redirect to the error page.
 elseif ( isInjected($email_address) ) {
-header( "Location: ../error.html" );
+header( "Location: error.html" );
 }
 
 // If we passed all previous tests, send the email!
 else {
 mail( "liamcwalsh2@gmail.com", "Feedback Form Results",
   $message, "From: $email_address" );
-header( "Location: ../thank_you.html" );
+header( "Location: thank_you.html" );
 }
 ?>
