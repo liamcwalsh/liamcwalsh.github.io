@@ -1,32 +1,47 @@
 var width = Math.max(960, innerWidth),
     height = Math.max(500, innerHeight);
 
-var i = 0;
+var x1 = width / 2,
+    y1 = height / 2,
+    x0 = x1,
+    y0 = y1,
+    i = 0,
+    r = 200,
+    τ = 2 * Math.PI;
 
-var svg = d3.select("#background").append("svg")
-    .attr("width", width)
-    .attr("height", height);
-
-svg.append("rect")
+var canvas = d3.select("body").append("canvas")
     .attr("width", width)
     .attr("height", height)
-    .on("ontouchstart" in document ? "touchmove" : "mousemove", particle);
+    .on("ontouchstart" in document ? "touchmove" : "mousemove", move);
 
-function particle() {
-  var m = d3.mouse(this);
+var context = canvas.node().getContext("2d");
+context.globalCompositeOperation = "lighter";
+context.lineWidth = 2;
 
-  svg.insert("circle", "rect")
-      .attr("cx", m[0])
-      .attr("cy", m[1])
-      .attr("r", 1e-6)
-      .style("stroke", d3.hsl((i = (i + 1) % 360), 1, .5))
-      .style("stroke-opacity", 1)
-    .transition()
+d3.timer(function() {
+  context.clearRect(0, 0, width, height);
+
+  var z = d3.hsl(++i % 360, 1, .5).rgb(),
+      c = "rgba(" + z.r + "," + z.g + "," + z.b + ",",
+      x = x0 += (x1 - x0) * .1,
+      y = y0 += (y1 - y0) * .1;
+
+  d3.select({}).transition()
       .duration(2000)
       .ease(Math.sqrt)
-      .attr("r", 100)
-      .style("stroke-opacity", 1e-6)
-      .remove();
+      .tween("circle", function() {
+        return function(t) {
+          context.strokeStyle = c + (1 - t) + ")";
+          context.beginPath();
+          context.arc(x, y, r * t, 0, τ);
+          context.stroke();
+        };
+      });
+});
 
+function move() {
+  var mouse = d3.mouse(this);
+  x1 = mouse[0];
+  y1 = mouse[1];
   d3.event.preventDefault();
 }
