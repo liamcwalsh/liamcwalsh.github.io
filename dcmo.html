@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Discrete Choice Model Optimization</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Theme CSS -->
+    <link href="css/freelancer.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- d3 Animations -->
+    <script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
+
+    <!-- MathJax -->
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML">
+	</script>
+
+</head>
+<style>
+rect {
+  fill: none;
+  pointer-events: all;
+}
+
+circle {
+  fill: none;
+  stroke-width: 2.5px;
+}
+
+svg {
+  display: inline-block;
+  vertical-align: baseline;
+}
+</style>
+
+<body id="page-top" class="index">
+<div id="skipnav"><a href="#maincontent">Skip to main content</a></div>
+
+    <!-- Navigation -->
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top navbar-custom">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="index.html">Liam Walsh</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="hidden">
+                        <a href="#page-top"></a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="index.html#portfolio">Projects</a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#about">About</a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#contact">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+
+    <!-- Header -->
+    <header>
+        <div class="container" id="maincontent" tabindex="-1">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="intro-text">
+                        <h1 class="name">Discrete Choice Model Optimization</h1>
+                        <hr>
+                    <div id="background" style="height:100vh; width:100vw;""></div>
+                    <!-- <script src="scripts/background.js"></script> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+<h2>Background</h2>
+
+<p> A common problem in business is the question of what price to charge, or, similarly, how much of a discount to offer on a good. A firm has to balance two conflicting restraints. They have to charge a price high enough so that they can maximize their own profit, while still setting the price low enough so that it is appealing to consumers. The question, then, becomes this: How can one optimize the profit, under these restraints? </p>
+
+<h2>The Discrete Choice Model</h2>
+ 
+ <p> Typically, the higher the price of a good, the less likely a consumer is to purchase that good. Further, the probability of purchase is dependent upon the product itself, the price of the product, and the specific consumer. In this model, assume that the firm in question is able to cater the price of the good towards one consumer. As such, this allows one to assume that the consumer, and thus the preferences associated with that consumer, remain constant. Next, since we are only discussing a single good, the attributes of the good in the model remain constant as well. Thus, the only thing which will be varied is the price. These assumptions are what comprise the Discrete Choice Model. </p>
+
+ <h2>The Logistic Model</h2>
+ <p>The logistic  model takes its name from the fact that it utilizes the logistic function to calculate probability. The logistic function looks like the following: </p>
+
+$$P = \frac{e^U}{1+e^U}$$
+
+<p> This is a particularly useful model, as it bounds \(P\) within \([0,1]\) </p>
+
+<p> Next, one can consider \(U\) to be the utility of a particular product. For this particular model, \(U\) is linear function of \(p\), the price: </p>
+
+$$U= \alpha - \beta p $$
+
+<p> Here, \(\alpha\) is a scalar representing the preferences of a particular consumer with respect to the good in question. \(\beta\) is a scalar determining how \(p\) affects utility, based on the consumer’s preference. When one combines both the logistic function and the utility function, the full Discrete Choice Model appears, with the probability function taking the following form: </p>
+
+$$P = \frac{e^{\alpha - \beta p}}{1+e^{\alpha - \beta p}} = \frac{1}{1+e^{\beta p-\alpha}} $$
+
+<p> Visually, the graphs of this probability function look like the following when varying \(\beta\) and \(\alpha\), respectively: </p>
+
+<div class="images">
+<img src="/images/blog/discrete_choice/purchprobbeta.png"/>
+
+<img src="/images/blog/discrete_choice/purchprobalpha.png"/>
+</div>
+
+
+<h2>Analytic Calculation</h2>
+
+<p>While this problem can be solved numerically, often an analytic solution to such a problem helps to reduce computation time, and simplifies the entire process. It can also help to make coding the solution to this problem more straightforward, and easier to read.</p>
+
+<p>The problem is to maximize total expected revenue, which is given by the the probability function times the price: </p>
+
+$$ E[R]=\frac{e^U}{1+e^U} * p $$
+
+<p>Next, maximize the expected revenue with respect to the price, p. Since the natural logarithm function is monotonic, one can maximize the log of the revenue function, and still preserve the true value of \(p^*\). This is merely done for ease of differentiation. The equation to maximize becomes the following: </p>
+
+$$ ln(R)=ln(p) + \alpha - \beta p - ln(1+e^{\alpha-\beta p}) $$
+
+<p> Deriving with respect to \(p\), then setting the equation equal to 0 yields: </p>
+
+$$ 0=\frac{1}{p} - \beta + \frac{\beta e^{\alpha-\beta p}}{1+e^{\alpha-\beta p}} $$
+
+<p> After some algebraic rearrangement, the following equation is left: </p>
+
+$$ e^{\alpha - \beta p} =( \beta p -1)  $$
+
+<p> To solve this equation for \(p^*\), I discovered the <a href="https://en.wikipedia.org/wiki/Lambert_W_function">Lambert W Function</a> was necessary </p>
+
+<h2>The Lambert W Function</h2>
+
+<p>This function, \(W(x)\), can be defined implicitly as: </p>
+
+$$ x=W(x)e^{W(x)} $$
+
+<p> Unfortunately, there does not exist a simple equation relaying the value of \(W(x)\). Instead, it must be represented in a series expansion, like the following, found from <a href="http://mathworld.wolfram.com/LambertW-Function.html">WolframMathWorld</a>: </p>
+
+$$ W(x)=\sum_{n=1}^{\infty} {\frac{(-1)^{n-1} (n^{n-2})}{(n-1)!} x^n}$$
+
+<p> This series converges for \(|x|<\frac{1}{e}\) </p>
+
+<h2>Finding the Optimal Price</h2>
+
+<p> To use the Lambert W function, some rearrangement must be done: </p>
+
+$$e^{\alpha -1}=(\beta p -1)e^{(\beta p -1)}$$
+
+<p> Then, after employing the Lambert W function: </p>
+
+$$ W(e^{\alpha-1})=\beta p -1 $$
+ 
+ <p>Finally, after performing some algebra, an explicit equation for the optimal price \(p^*\) appears: </p>
+
+$$ p^*=\frac{W(e^{\alpha -1}) +1}{\beta} $$
+
+<h2>Numerical Calculation</h2>
+
+<p> In this case, no longer do I seek to find \(p^*\) through an explicit formula, but instead I have a computer sort through all the values to find a maximum. Below are two graphs created in MATLAB. In this first one, \(\beta=.1\), and \(\alpha\) varies between 0 and 10 in .5 step increments. </p>
+
+<div class="images">
+<img src="/images/blog/discrete_choice/vary_alpha.png"/>
+</div>
+
+<p> There are two things which one can immediately glean from this graph. First, one can see that as \(\alpha\) increases, so does \(p^*\) and the maximum revenue. This finding makes sense on an intuitive level; As \(\alpha\) increases, a customer's utility becomes more heavily defined in terms of the other reasons why the good is desirable. In this case, one can charge a higher price on the good without affecting the overall utility of the good to a consumer, which leads to higher revenue. </p>
+
+<p> A second finding is that the maxima occur in a linear fashion, which is curious. </p>
+
+
+
+<p> This next graph below shifts \(\beta\); values from .05 to .49, while holding \(\alpha=4\): </p>
+
+<div class="images">
+<img src="images/blog/discrete_choice/vary_beta.png"/>
+</div>
+
+<p> First, notice that as \(\beta\) increases in magnitude, the optimal price falls, as does the maximum revenue. Not only is this consistent with the analytic solution for \(p^*\) (since \(p^*\) is inversely proportional to \(\beta\)), but it also makes logical sense. A larger \(\beta\) means that utility is more heavily affected by the price. The consumer is more concerned about the price of the good, rather than what they like about the good. This then affects the probability function, and the revenue function. </p>
+
+<p> Again, the maxima occur in a near linear fashion. Given that in both cases of varying \(\alpha\) and \(\beta\) that the maxima occur in a linear fashion, there may be some way to find a simpler approximation for \(p^*\). </p>
+
+<h2>Comparison of Analytic vs Numerical Calculation</h2>
+
+<p> While it is interesting to find an explicit formula for \(p^*\), it is more important to discover if this formula can actually be of any use. First, we can use the explicit formula to determine how accurate the maxima found numerically are: </p>
+
+<p> Here, the filled orange circles represent the maxima found analytically, and the black, empty circles are the numerically found maxima. Clearly, the numerically found maxima are pretty accurate. The percent error was on the scale of \(10^{-6}\) </p>
+
+<p>Since the numerical maxima are known to be accurate, one might wonder which method arrives at the optimal price faster. </p>
+
+<div class="images">
+<img src="images/blog/discrete_choice/analy_vs_numer_runtime.png"/>
+</div>
+
+<p> The answer, quite clearly, is that the numerical calculation is faster. In this case, the average runtime of the analytic calculation was .0301s, where it only took an average of .00012986s for the numerical calculation. Both of these calculations come from analysis of runtimes in MATLAB. </p>
+
+<h2>Concluding Remarks</h2>
+
+<p> Overall, I discovered that there does exist an explicit equation determining the price which optimizes revenue. I also noticed a trend in the maxima when varying \(\beta\) and \(\alpha\): The maxima occurred in a linear fashion. This seems to indicate that there may be a way to approximate the equation for the optimal price. If so, this raises a few questions: </p>
+
+<p> What is the explicit form of the approximation? </p>
+<p> Is it accurate enough for practical use? </p>
+<p> Is the runtime of the approximation better than that of the simple numerical finding of the optimal price? </p>
+
+</body>
+</html>
